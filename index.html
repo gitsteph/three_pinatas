@@ -4,16 +4,38 @@
         <meta charset="utf-8">
         <title>three_pinatas</title>
         <style>
-            body { margin: 0; }
-            canvas { width: 100%; height: 100% }
+            body {
+                margin: 0;
+                font-family: Monospace;
+                font-size: 14px;
+            }
+            canvas {
+                width: 100%; height: 100%
+            }
+            #info {
+                position: absolute;
+                top: 0px;
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+                z-index: 1;
+            }
         </style>
     </head>
     <body>
+        <div id="info">
+            <a href="https://github.com/gitsteph/three_pinatas">three_pinatas</a> - with orbit controls
+        </div>
+
         <script src="js/three.js"></script>
         <script src="js/GLTFLoader.js"></script>
+        <script src="js/OrbitControls.js"></script>
 
         <script>
             var scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0xffffff );
+            scene.fog = new THREE.FogExp2( 0xcccccc, 0.1 );
+
             var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
             var renderer = new THREE.WebGLRenderer();
@@ -22,6 +44,8 @@
             renderer.gammaOutput = true;
 
             document.body.appendChild(renderer.domElement);
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target.set(0,-1.5,-6);
 
             var light = new THREE.AmbientLight( 0x404040, 0.05 ); // soft white light
             scene.add( light );
@@ -33,6 +57,7 @@
 
                 gltf.animations; // Array<THREE.AnimationClip>
                 gltf.scene; // THREE.Scene
+                gltf.scene.children[0].material.side = THREE.DoubleSide;
                 gltf.scenes; // Array<THREE.Scene>
                 gltf.cameras; // Array<THREE.Camera>
                 gltf.asset; // Object
@@ -40,10 +65,12 @@
                 console.error ( error );
             } );
 
-            camera.position.z = -2;
+            camera.position.set((Math.random()-.5)*6,0,-3);
+            controls.update();
 
             function animate() {
                 requestAnimationFrame(animate);
+                controls.update();
 
                 renderer.render(scene, camera);
             }
